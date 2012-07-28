@@ -1,7 +1,7 @@
 from struct import unpack_from, calcsize
 from scipy.interpolate import interp1d as interpolate
 
-class ACV(object):
+class ACVReader(object):
 	def __init__(self, buf):
 		self.buf = buf
 		self.off = 0
@@ -31,11 +31,14 @@ class ACV(object):
 			y = [v[1] for v in c]
 			if(len(x) > 2):
 				f = interpolate(x, y, kind='cubic')
+				sweep = xrange(0,256)
+				values = [int(round(v)) for v in f(xrange(0,256))]
+				self.precomputed.append(zip(sweep, values))
 			else:
-				f = interpolate(x, y)
-			sweep = xrange(0,256)
-			values = [int(round(v)) for v in f(xrange(0,256))]
-			self.precomputed.append(zip(sweep, values))
-
+				# interpolate(x,y) 
+				# but this is useless - why bother
+				# usually will just be a 0,0 - 255,255 line
+				self.precomputed.append([])
+	
 	def __repr__(self):
 		return "Adobe Curve <%d channels>" % (len(self.curves))
