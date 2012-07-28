@@ -1,4 +1,4 @@
-iodine
-======
+io.dine
+=======
 
-An alternative way to filter images
+A small tool to convert Adobe Photoshop Curves into an HTML5 filter in javascript
