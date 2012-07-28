@@ -1,0 +1,102 @@
+<html>
+	<head>
+	<script src="../lib/iodine.js"> 
+	</script>
+	<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+	<style type="text/css">
+	#sliders { margin: 10px; }
+	#brightness-slider { background: #ccc; }
+	#red-slider { background: #F7977A; }
+	#green-slider { background: #82CA9D; }
+	#blue-slider { background: #8493CA; }
+
+	</style>
+	</head>
+	<body>
+		<img id="src-image" src="image.jpg" />
+		<div style="padding:10px">
+		<input id="image-reset" value="Reset" type="button" />
+		<input id="image-filter" value="Hipster filter" type="button" />
+		</div>
+		<div id="sliders">
+		Brightness:
+		<div id="brightness-slider"></div>
+		Red:
+		<div id="red-slider"></div>
+		Green:
+		<div id="green-slider"></div>
+		Blue:
+		<div id="blue-slider"></div>
+		</div>
+	</body>
+	<script>
+	$(function() {
+		var _img = new Image();
+		var pixels = null;
+		var _original = $("#src-image").attr("src");
+
+		var onload = _img.onload = function() {
+			_img.onload = null;
+			console.log(_img.width);
+			pixels = new Iodine.Pixels(_img);
+			$('#sliders').css('width', _img.width);
+			$( "#brightness-slider" ).slider({
+				stop: function(event, ui) { 
+					pixels.brighten(ui.value, ui.value, ui.value);
+					$("#src-image").attr("src", pixels.image());
+				}
+			});
+	
+			$( "#red-slider" ).slider({
+				stop: function(event, ui) { 
+					pixels.brighten(ui.value, 0, 0);
+					$("#src-image").attr("src", pixels.image());
+				}
+			});
+	
+			$( "#green-slider" ).slider({
+				stop: function(event, ui) { 
+					pixels.brighten(0, ui.value, 0);
+					$("#src-image").attr("src", pixels.image());
+				}
+			});
+	
+			$( "#blue-slider" ).slider({
+				stop: function(event, ui) { 
+					pixels.brighten(0, 0, ui.value);
+					$("#src-image").attr("src", pixels.image());
+				}
+			});
+		};
+
+		var reset = function() {
+			_img = new Image();
+			_img.onload = onload;
+			_img.src = _original;
+			$("#src-image").attr("src", _original);
+			$("#brightness-slider").slider({"value":0});
+			$("#red-slider").slider({"value":0});
+			$("#blue-slider").slider({"value":0});
+			$("#green-slider").slider({"value":0});
+		}
+	
+		_img.src = $("#src-image").attr("src");
+
+		$("#image-reset" ).button().click(function() { reset(); });
+		$("#image-filter" ).button().click(function() { 
+			$.getJSON('test.json', function(data) {
+				pixels.applycurve(data);
+				$("#src-image").attr("src", pixels.image());
+			});
+		});
+	
+		$("#brightness-slider").slider({"orientation" : "horizontal", "min":-255, "max":255, "value" : 0});
+		$("#red-slider").slider({"orientation" : "horizontal", "min":-255, "max":255, "value" : 0});
+		$("#green-slider").slider({"orientation" : "horizontal", "min":-255, "max":255, "value" : 0});
+		$("#blue-slider").slider({"orientation" : "horizontal", "min":-255, "max":255, "value" : 0});
+
+	});
+	</script>
+</html>
